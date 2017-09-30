@@ -6,6 +6,9 @@ var bcrypt = require('bcrypt-nodejs');
 //modelos
 var User = require('../models/user');
 
+//servicio
+var jwt = require('../services/jwt');
+
 //acciones
 function pruebas(req, res){
 	res.status(200).send({
@@ -81,7 +84,15 @@ function login(req, res){
 			}else{
 				bcrypt.compare(pass, user.pass, (err, check) => {
 					if(check){
-						res.status(200).send({user});
+						//comprobar el token
+						if(params.gettoken){
+							//crear token
+							res.status(200).send({
+								token: jwt.createToken(user)
+							});
+						}else{
+							res.status(200).send({user});
+						}
 					}else{
 						res.status(404).send({
 							message: "Contraseña incorrecta"
