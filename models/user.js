@@ -1,13 +1,13 @@
 'use strict'
 
-var mongoose = required('mongoose');
+var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var UserSchema = Schema({
 	name: String,
 	surname: String,
 	email: String,
-	password: String,
+	pass: String,
 	role: String
 });
 
