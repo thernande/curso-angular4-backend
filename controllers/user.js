@@ -28,22 +28,35 @@ function saveUser(req, res){
 		user.role = 'ROLE_USER';
 		user.image = null;
 
-		//cifrado de la contraseña
-		bcrypt.hash(params.pass, null, null, function(err,hash){
-			user.pass = hash;
+		User.findOne({email:user.email.toLowerCase()}, (err, issetUser) => {
+			if (err) {
+				res.status(500).send({message:'Error al comprobar el usuario'});
+			}else{
+				if(!issetUser){
+					bcrypt.hash(params.pass, null, null, function(err,hash){
+						user.pass = hash;
 
-			user.save((err, userStored) => {
-				if(err){
-					res.status(500).send({message:'error al guardar el usuario'});
+						user.save((err, userStored) => {
+							if(err){
+								res.status(500).send({message:'error al guardar el usuario'});
+							}else{
+								if(!userStored){
+									res.status(404).send({message:'no se ha registrado el usuario'});
+								}else{
+									res.status(200).send({user: userStored});
+								}
+							}
+						})
+					});
 				}else{
-					if(!userStored){
-						res.status(404).send({message:'no se ha registrado el usuario'});
-					}else{
-						res.status(200).send({user: userStored});
-					}
+					res.status(200).send({
+						message: "el usuario ya existe"
+					});
 				}
-			})
-		});
+			}
+		})
+		//cifrado de la contraseña
+		
 	}else{
 		res.status(200).send({
 			message: "introduce bien los datos"
