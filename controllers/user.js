@@ -33,6 +33,7 @@ function saveUser(req, res){
 				res.status(500).send({message:'Error al comprobar el usuario'});
 			}else{
 				if(!issetUser){
+					//cifrado de la contraseña
 					bcrypt.hash(params.pass, null, null, function(err,hash){
 						user.pass = hash;
 
@@ -54,20 +55,46 @@ function saveUser(req, res){
 					});
 				}
 			}
-		})
-		//cifrado de la contraseña
-		
+		})		
 	}else{
 		res.status(200).send({
 			message: "introduce bien los datos"
 		});
 	}
-	//console.log(params);
 
-	
+	//console.log(params);
+}
+
+function login(req, res){
+	var params = req.body;
+	var pass = params.pass;
+
+	var email = params.email;
+	User.findOne({email: email.toLowerCase()}, (err, user) => {
+		if (err) {
+			res.status(500).send({message:'Error al comprobar el usuario'});
+		}else{
+			if(!user){
+				res.status(404).send({
+					message: "El usuario no existe"
+				});
+			}else{
+				bcrypt.compare(pass, user.pass, (err, check) => {
+					if(check){
+						res.status(200).send({user});
+					}else{
+						res.status(404).send({
+							message: "Contraseña incorrecta"
+						});
+					}
+				});
+			}
+		}
+	});
 }
 
 module.exports = {
 	pruebas,
-	saveUser
+	saveUser,
+	login
 }
