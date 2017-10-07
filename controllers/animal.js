@@ -52,7 +52,25 @@ function saveAnimal(req, res){
 	//res.status(200).send({message: "Probando el metodo de guardar"})
 }
 
+function getAnimals(req, res){
+	Animal.find({}).populate({path: 'user'}).exec((err, animals) =>{
+		if(err){
+				res.status(500).send({ error: 'Something failed!' });
+		}
+		else
+		{
+			if(!animals){
+				res.status(404).send({ error: 'no se pudo encontrar animales' });
+			}
+			{
+				res.status(404).send({animals});
+			}
+		}
+	});
+}
+
 module.exports = {
 	pruebas,
-	saveAnimal
+	saveAnimal,
+	getAnimals
 }
