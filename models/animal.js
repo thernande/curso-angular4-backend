@@ -1,6 +1,6 @@
 'use strict'
 
-var mongoose = required('mongoose');
+var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var AnimalSchema = Schema({
