@@ -12,6 +12,7 @@ var mdUpload = multipart({ uploadDir: './uploads/animals'});
 api.get('/pruebas-animales', mdAuth.ensureAuth, AnimalController.pruebas);
 api.post('/animal', mdAuth.ensureAuth, AnimalController.saveAnimal);
 api.get('/animals', AnimalController.getAnimals);
+api.get('/animal/:id', AnimalController.getAnimal);
 
 
 module.exports = api;

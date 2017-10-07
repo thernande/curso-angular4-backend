@@ -63,14 +63,34 @@ function getAnimals(req, res){
 				res.status(404).send({ error: 'no se pudo encontrar animales' });
 			}
 			{
-				res.status(404).send({animals});
+				res.status(200).send({animals});
 			}
 		}
 	});
 }
 
+function getAnimal(req, res){
+	var animalId = req.params.id;
+
+	Animal.findById(animalId).populate({path: 'user'}).exec((err, animal) => {
+		if(err){
+				res.status(500).send({ error: 'Something failed!' });
+		}
+		else
+		{
+			if(!animal){
+				res.status(404).send({ error: 'no se pudo encontrar el animal' });
+			}
+			{
+				res.status(200).send({animal});
+			}
+		}
+	})
+}
+
 module.exports = {
 	pruebas,
 	saveAnimal,
-	getAnimals
+	getAnimals,
+	getAnimal
 }
