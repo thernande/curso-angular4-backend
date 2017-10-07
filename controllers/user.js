@@ -3,6 +3,7 @@
 //modulos
 var bcrypt = require('bcrypt-nodejs');
 var fs = require('fs');
+var path = require('path');
 
 //modelos
 var User = require('../models/user');
@@ -179,10 +180,47 @@ function uploadImage(req, res){
 	}
 }
 
+function getImageFile(req, res){
+	var imageFile = req.params.imageFile;
+	var pathFile = './uploads/users/'+imageFile;
+
+	fs.exists(pathFile, function(exists){
+		if(exists){
+			res.sendFile(path.resolve(pathFile));
+		}else
+		{
+			res.status(404).send({message:'the image doesnt exists'});
+		}
+		
+	});
+	//res.status(200).send({message:'get image file'});
+}
+
+function getKeepers(req,res){
+	User.find({role:'ROLE_ADMIN'}).exec((err, users) => {
+		if(err){
+			res.status(500).send({message: 'there is a error'});
+		}
+		else
+		{
+			if (!users){
+				res.status(404).send({message:'no hay datos'})
+			}
+			else
+			{
+				res.status(200).send({users});
+			}	
+		}
+	})
+	//res.status(200).send({message: 'metodo get keepers'})
+}
+
 module.exports = {
 	pruebas,
 	saveUser,
 	login,
 	updateUser,
-	uploadImage
+	uploadImage,
+	getImageFile,
+	getKeepers
 }
