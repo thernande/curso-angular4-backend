@@ -6,9 +6,13 @@ var UserController = require('../controllers/user');
 var api = express.Router();
 var mdAuth = require("../middlewares/authenticated");
 
+var multipart = require('connect-multiparty');
+var mdUpload = multipart({ uploadDir: './uploads/users'});
+
 api.get('/pruebas-del-controllador', mdAuth.ensureAuth, UserController.pruebas);
 api.post('/save', UserController.saveUser);
 api.post('/login', UserController.login);
 api.put('/update-user/:id', mdAuth.ensureAuth, UserController.updateUser);
+api.post('/upload-image-user/:id', [mdAuth.ensureAuth, mdUpload], UserController.uploadImage);
 
 module.exports = api;
