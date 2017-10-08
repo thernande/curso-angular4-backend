@@ -88,9 +88,120 @@ function getAnimal(req, res){
 	})
 }
 
+function updateAnimal(req, res){
+	var animalId = req.params.id;
+	var update = req.body;
+
+	Animal.findByIdAndUpdate(animalId, update, {new:true}, (err, animalUpdate) =>{
+		if(err){
+			res.status(500).send({ error: 'Something failed!' });
+		}
+		else
+		{
+			if(!animalUpdate){
+				res.status(404).send({ error: 'no se pudo actualizar el animal' });
+			}
+			else
+			{
+				res.status(200).send({animalUpdate});
+			}
+		}
+	})
+}
+
+function uploadImage(req, res){
+	var animalId = req.params.id;
+	var file_name = 'empty';
+	//console.log(req.files);
+	if(req.files){
+		var file_path = req.files.image.path;
+		var file_split = file_path.split('/');
+		file_name = file_split[2];
+
+		var ext_split = file_name.split('.');
+		var file_ext = ext_split[1];
+
+		if(file_ext == "png" || file_ext == "jpg" || file_ext == "jpeg" || file_ext == "gif"){
+			
+			/*if(animalId != req.animal.sub){
+				return res.status(404).send({
+					message: "no tienes permiso para actualizar el animal"
+				})
+			}*/
+
+			Animal.findByIdAndUpdate(animalId, {image: file_name}, {new:true}, (err, animalUpdate) =>{
+				if (err) {
+					res.status(500).send({message:'Error al actualizar el animal'});
+				}else{
+					if(!animalUpdate){
+						res.status(404).send({message:'no se ha podido actualizar el animal'});
+					}else{
+						res.status(200).send({animal: animalUpdate, image: file_name});
+					}
+				}
+			});
+
+		}else{
+			fs.unlink(file_path, (err) =>{
+				if (err) {
+					res.status(200).send({message:'invalid form and file erase'});
+				}
+				else{
+					res.status(200).send({message:'invalid form'});
+				}
+			})
+
+			
+		}
+		
+	}else{
+		res.status(404).send({message:'the image has not been upload'});
+	}
+}
+
+function getImageFile(req, res){
+	var imageFile = req.params.imageFile;
+	var pathFile = './uploads/animals/'+imageFile;
+
+	fs.exists(pathFile, function(exists){
+		if(exists){
+			res.sendFile(path.resolve(pathFile));
+		}else
+		{
+			res.status(404).send({message:'the image doesnt exists'});
+		}
+		
+	});
+	//res.status(200).send({message:'get image file'});
+}
+
+function deleteAnimal(req, res){
+	var animalId = req.params.id;
+
+	Animal.findByIdAndRemove(animalId, (err, animalRemove) => {
+		if(err){
+			res.status(500).send({ error: 'Something failed!' });
+		}
+		else
+		{
+			if(!animalRemove){
+				res.status(404).send({ error: 'no se ha podido borrar el animal' });
+			}
+			else
+			{
+				res.status(200).send({animalRemove});
+			}
+		}
+	});
+}
+
 module.exports = {
 	pruebas,
 	saveAnimal,
 	getAnimals,
-	getAnimal
+	getAnimal,
+	updateAnimal,
+	uploadImage,
+	getImageFile,
+	deleteAnimal
 }
